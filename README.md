@@ -1,9 +1,13 @@
 # YazOS Roadmap
 
-- [ ] Bootloader
+- [x] Bootloader
   - Minimal bootloader (use GRUB)
   - Setup stage 1 kernel entry
-
+    
+- [ ] Basic I/O
+  - Print to screen (framebuffer/VGA)
+  - Read keyboard input
+    
 - [ ] Kernel Setup
   - Switch to long mode (64-bit)
   - Setup page tables (paging)
@@ -12,10 +16,6 @@
 - [ ] Interrupts
   - Setup IDT (Interrupt Descriptor Table)
   - Handle basic hardware interrupts (keyboard, timer)
-
-- [ ] Basic I/O
-  - Print to screen (framebuffer/VGA)
-  - Read keyboard input
 
 - [ ] Memory Management
   - Simple heap allocator
