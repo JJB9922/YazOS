@@ -1,4 +1,4 @@
-const std = @import("std");
+const console = @import("console.zig");
 
 const ALIGNMENT_FLAG = 1 << 0;
 const MEMORY_FLAG = 1 << 1;
@@ -22,4 +22,8 @@ export fn _start() callconv(.Naked) noreturn {
     while (true) {}
 }
 
-export fn main() void {}
+export fn main() void {
+    console.setColours(.White, .Red);
+    console.clear();
+    console.putString("I am almost ready to write the zig first impressions blog post, I think.");
+}
