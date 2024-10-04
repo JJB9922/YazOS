@@ -49,8 +49,16 @@ fn putCharAt(c: u8, newColour: u8, x: usize, y: usize) void {
 }
 
 pub fn putChar(c: u8) void {
+    if (c == '\n') {
+        column = 0;
+        row += 1;
+        if (row == VGA_HEIGHT) row = 0;
+        return;
+    }
+
     putCharAt(c, colour, column, row);
     column += 1;
+
     if (column == VGA_WIDTH) {
         column = 0;
         row += 1;

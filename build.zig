@@ -4,7 +4,7 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{ .default_target = .{ .cpu_arch = .x86, .os_tag = .freestanding } });
     const optimize = b.standardOptimizeOption(.{});
 
-    const exe = b.addExecutable(.{ .name = "YazOS.ELF", .root_source_file = b.path("src/main.zig"), .target = target, .optimize = optimize, .code_model = .kernel });
+    const exe = b.addExecutable(.{ .name = "YazOS.elf", .root_source_file = b.path("src/main.zig"), .target = target, .optimize = optimize, .code_model = .kernel });
 
     exe.setLinkerScript(b.path("src/linker.ld"));
 
@@ -12,8 +12,36 @@ pub fn build(b: *std.Build) void {
 
     const run_cmd = b.addSystemCommand(&.{"qemu-system-x86_64"});
     run_cmd.addArg("-kernel");
-    run_cmd.addArg("./zig-out/bin/YazOS.ELF");
+    run_cmd.addArg("./zig-out/bin/YazOS.elf");
 
     const run_step = b.step("run", "Run the kernel in QEMU");
     run_step.dependOn(&run_cmd.step);
+
+    const mkdir_cmd = b.addSystemCommand(&.{"mkdir"});
+    mkdir_cmd.addArg("-p");
+    mkdir_cmd.addArg("isodir/boot/grub");
+
+    const cp_kernel_cmd = b.addSystemCommand(&.{"cp"});
+    cp_kernel_cmd.addArg("zig-out/bin/YazOS.elf");
+    cp_kernel_cmd.addArg("isodir/boot/YazOS.elf");
+    cp_kernel_cmd.step.dependOn(&mkdir_cmd.step);
+
+    const cp_grub_cmd = b.addSystemCommand(&.{"cp"});
+    cp_grub_cmd.addArg("grub.cfg");
+    cp_grub_cmd.addArg("isodir/boot/grub/grub.cfg");
+    cp_grub_cmd.step.dependOn(&cp_kernel_cmd.step);
+
+    const grub_cmd = b.addSystemCommand(&.{"grub-mkrescue"});
+    grub_cmd.addArg("-o");
+    grub_cmd.addArg("YazOS.iso");
+    grub_cmd.addArg("isodir");
+    grub_cmd.step.dependOn(&cp_grub_cmd.step);
+
+    const qemu_cmd = b.addSystemCommand(&.{"qemu-system-i386"});
+    qemu_cmd.addArg("-cdrom");
+    qemu_cmd.addArg("YazOS.iso");
+    qemu_cmd.step.dependOn(&grub_cmd.step);
+
+    const package_step = b.step("package", "Package an ISO of the kernel and run it from QEMU");
+    package_step.dependOn(&qemu_cmd.step);
 }
