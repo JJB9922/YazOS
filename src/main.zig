@@ -24,5 +24,5 @@ export fn _start() callconv(.Naked) noreturn {
 
 export fn main() void {
     try console.terminal_initialize();
-    try console.terminal_write_string("Hello");
+    try console.terminal_write_string("Hello1\nThis\nIs\nA\nTest\nOf\nNewline.\nIt\nNeeds\nExceed\nThe\nScreen\nHello2\nHello3\nThis\nIs\nA\nTest\nOf\nNewline.\nIt\nNeeds Exceed The\nScreen\nHello4\nHello5\nHello6\nHello7");
 }

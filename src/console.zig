@@ -46,6 +46,8 @@ pub fn terminal_initialize() !void {
 
 fn clear() !void {
     @memset(terminal_buffer[0..VGA_SIZE], vga_build_colored_character(' ', terminal_color));
+    terminal_column = 0;
+    terminal_row = 0;
 }
 
 fn terminal_set_color(c: Color) !void {
@@ -57,15 +59,35 @@ fn terminal_put_char_at(char: u8, color: u8, x: usize, y: usize) !void {
     terminal_buffer[idx] = vga_build_colored_character(char, color);
 }
 
+fn terminal_new_line() !void {
+    terminal_row += 1;
+    terminal_column = 0;
+}
+
+fn terminal_push_content_up() !void {
+    for (1..VGA_HEIGHT) |row_idx| {
+        for (0..VGA_WIDTH) |col_idx| {
+            try terminal_put_char_at(@truncate(terminal_buffer[(row_idx * VGA_WIDTH) + col_idx]), terminal_color, col_idx, row_idx - 1);
+        }
+    }
+}
+
 fn terminal_put_char(char: u8) !void {
-    try terminal_put_char_at(char, terminal_color, terminal_column, terminal_row);
-    terminal_column += 1;
+    if (char == '\n') {
+        try terminal_new_line();
+    } else {
+        try terminal_put_char_at(char, terminal_color, terminal_column, terminal_row);
+        terminal_column += 1;
+    }
+
     if (terminal_column == VGA_WIDTH) {
         terminal_column = 0;
         terminal_row += 1;
-        if (terminal_row == VGA_HEIGHT) {
-            terminal_row = 0;
-        }
+    }
+
+    if (terminal_row == VGA_HEIGHT) {
+        try terminal_push_content_up();
+        terminal_row = VGA_HEIGHT - 1;
     }
 }
 
@@ -73,15 +95,4 @@ pub fn terminal_write_string(data: []const u8) !void {
     for (data) |c| {
         try terminal_put_char(c);
     }
-}
-
-pub const writer = Writer(void, error{}, callback){ .context = {} };
-
-fn callback(_: void, string: []const u8) error{}!usize {
-    terminal_put_char(string);
-    return string.len;
-}
-
-pub fn printf(comptime format: []const u8, args: anytype) void {
-    fmt.format(writer, format, args) catch unreachable;
 }
