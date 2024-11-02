@@ -72,14 +72,7 @@ fn terminal_push_content_up() !void {
     }
 }
 
-fn terminal_put_char(char: u8) !void {
-    if (char == '\n') {
-        try terminal_new_line();
-    } else {
-        try terminal_put_char_at(char, terminal_color, terminal_column, terminal_row);
-        terminal_column += 1;
-    }
-
+fn terminal_bounds_check() !void {
     if (terminal_column == VGA_WIDTH) {
         terminal_column = 0;
         terminal_row += 1;
@@ -91,6 +84,17 @@ fn terminal_put_char(char: u8) !void {
     }
 }
 
+fn terminal_put_char(char: u8) !void {
+    if (char == '\n') {
+        try terminal_new_line();
+    } else {
+        try terminal_put_char_at(char, terminal_color, terminal_column, terminal_row);
+        terminal_column += 1;
+    }
+
+    try terminal_bounds_check();
+}
+
 pub fn terminal_draw_line() !void {
     const line: []const u8 = ".:*~*:._.:*~*:._.:*~*:._.:*~*:._.:*~*:._.:*~*:._.:*~*:._.:*~*:.";
     for (0..VGA_WIDTH) |idx| {
@@ -99,15 +103,7 @@ pub fn terminal_draw_line() !void {
         terminal_column += 1;
     }
 
-    if (terminal_column == VGA_WIDTH) {
-        terminal_column = 0;
-        terminal_row += 1;
-    }
-
-    if (terminal_row == VGA_HEIGHT) {
-        try terminal_push_content_up();
-        terminal_row = VGA_HEIGHT - 1;
-    }
+    try terminal_bounds_check();
 }
 
 pub fn terminal_write_string(data: []const u8) !void {
