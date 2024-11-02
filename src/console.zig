@@ -29,7 +29,7 @@ const VGA_HEIGHT: usize = 25;
 const VGA_SIZE: usize = VGA_WIDTH * VGA_HEIGHT;
 var terminal_row: usize = 0;
 var terminal_column: usize = 0;
-var terminal_color: u8 = vga_build_color_base(Color.VGA_COLOR_WHITE, Color.VGA_COLOR_BLUE);
+var terminal_color: u8 = vga_build_color_base(Color.VGA_COLOR_WHITE, Color.VGA_COLOR_DARK_GREY);
 var terminal_buffer: [*]volatile u16 = @ptrFromInt(0xB8000);
 
 fn vga_build_color_base(fg: Color, bg: Color) u8 {
@@ -77,6 +77,25 @@ fn terminal_put_char(char: u8) !void {
         try terminal_new_line();
     } else {
         try terminal_put_char_at(char, terminal_color, terminal_column, terminal_row);
+        terminal_column += 1;
+    }
+
+    if (terminal_column == VGA_WIDTH) {
+        terminal_column = 0;
+        terminal_row += 1;
+    }
+
+    if (terminal_row == VGA_HEIGHT) {
+        try terminal_push_content_up();
+        terminal_row = VGA_HEIGHT - 1;
+    }
+}
+
+pub fn terminal_draw_line() !void {
+    const line: []const u8 = ".:*~*:._.:*~*:._.:*~*:._.:*~*:._.:*~*:._.:*~*:._.:*~*:._.:*~*:.";
+    for (0..VGA_WIDTH) |idx| {
+        if (idx >= line.len) break;
+        try terminal_put_char_at(line[idx], vga_build_color_base(Color.VGA_COLOR_WHITE, Color.VGA_COLOR_LIGHT_RED), terminal_column, terminal_row);
         terminal_column += 1;
     }
 
