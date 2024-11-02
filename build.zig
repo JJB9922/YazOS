@@ -37,11 +37,11 @@ pub fn build(b: *std.Build) void {
     grub_cmd.addArg("isodir");
     grub_cmd.step.dependOn(&cp_grub_cmd.step);
 
-    const qemu_cmd = b.addSystemCommand(&.{"qemu-system-i386"});
-    qemu_cmd.addArg("-cdrom");
-    qemu_cmd.addArg("YazOS.iso");
-    qemu_cmd.step.dependOn(&grub_cmd.step);
+    //const qemu_cmd = b.addSystemCommand(&.{"qemu-system-i386"});
+    //qemu_cmd.addArg("-cdrom");
+    //qemu_cmd.addArg("YazOS.iso");
+    //qemu_cmd.step.dependOn(&grub_cmd.step);
 
     const package_step = b.step("package", "Package an ISO of the kernel and run it from QEMU");
-    package_step.dependOn(&qemu_cmd.step);
+    package_step.dependOn(&grub_cmd.step);
 }
