@@ -99,7 +99,7 @@ pub fn terminal_draw_line() !void {
     const line: []const u8 = ".:*~*:._.:*~*:._.:*~*:._.:*~*:._.:*~*:._.:*~*:._.:*~*:._.:*~*:.";
     for (0..VGA_WIDTH) |idx| {
         if (idx >= line.len) break;
-        try terminal_put_char_at(line[idx], vga_build_color_base(Color.VGA_COLOR_WHITE, Color.VGA_COLOR_LIGHT_RED), terminal_column, terminal_row);
+        try terminal_put_char_at(line[idx], vga_build_color_base(Color.VGA_COLOR_DARK_GREY, Color.VGA_COLOR_LIGHT_RED), terminal_column, terminal_row);
         terminal_column += 1;
     }
 

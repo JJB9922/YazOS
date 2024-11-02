@@ -27,5 +27,5 @@ export fn main() void {
     try console.terminal_draw_line();
     try console.terminal_write_string("\nSneebleOS v0.0.1\n");
     try console.terminal_draw_line();
-    try console.terminal_write_string("\n\nHello and welcome to an OS more stable than micwotoft binblows");
+    try console.terminal_write_string("\n\nHello and welcome to an OS more stable than the one that rhymes with bike row loft bin lows");
 }
