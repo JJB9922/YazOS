@@ -23,5 +23,6 @@ export fn _start() callconv(.Naked) noreturn {
 }
 
 export fn main() void {
-    console.terminal_initialize();
+    try console.terminal_initialize();
+    try console.terminal_write_string("Hello");
 }
