@@ -4,9 +4,12 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{ .default_target = .{ .cpu_arch = .x86, .os_tag = .freestanding } });
     const optimize = b.standardOptimizeOption(.{});
 
-    const exe = b.addExecutable(.{ .name = "YazOS.elf", .root_source_file = b.path("src/main.zig"), .target = target, .optimize = optimize, .code_model = .kernel });
+    const exe = b.addExecutable(.{ .name = "YazOS.elf", .root_source_file = b.path("src/kernel/kernel/kernel.zig"), .target = target, .optimize = optimize, .code_model = .kernel });
 
-    exe.setLinkerScript(b.path("src/linker.ld"));
+    const tty_mod = b.addModule("tty", .{ .root_source_file = b.path("src/kernel/arch/i386/tty.zig") });
+
+    exe.setLinkerScript(b.path("src/kernel/arch/i386/linker.ld"));
+    exe.root_module.addImport("tty", tty_mod);
 
     b.installArtifact(exe);
 
