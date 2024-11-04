@@ -4,7 +4,7 @@
   - Minimal bootloader (use GRUB)
   - Setup stage 1 kernel entry
     
-- [ ] Basic I/O
+- [x] Basic I/O
   - Print to screen (framebuffer/VGA)
     
 - [ ] Kernel Setup
