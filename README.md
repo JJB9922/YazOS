@@ -6,7 +6,6 @@
     
 - [ ] Basic I/O
   - Print to screen (framebuffer/VGA)
-  - Read keyboard input
     
 - [ ] Kernel Setup
   - Switch to long mode (64-bit)
