@@ -1,8 +1,8 @@
 // This kernel uses the VGA text mode buffer (located at 0xB8000) as the output device.
 // It sets up a simple driver that remembers the location of the next character in this buffer and provides a primitive for adding a new character.
 
-const fmt = @import("std").fmt;
 const Writer = @import("std").io.Writer;
+const va_list = @import("std").builtin.VaList;
 const vga = @import("vga.zig");
 
 const VGA_WIDTH: usize = 80;
@@ -71,5 +71,29 @@ fn terminal_put_char(char: u8) !void {
 pub fn terminal_write_string(data: []const u8) void {
     for (data) |c| {
         try terminal_put_char(c);
+    }
+}
+
+pub fn print(comptime format: []const u8, args: anytype) void {
+    var index: usize = 0;
+    while (index < format.len) : (index += 1) {
+        const char = format[index];
+        if (char == '%') {
+            index += 1;
+            const char_arg = format[index];
+            switch (char_arg) {
+                'c' => {
+                    const arg = args[0];
+                    terminal_put_char(@as(u8, arg));
+                },
+                's' => {
+                    const arg = args[0];
+                    terminal_put_char(@as([:0]const u8, arg));
+                },
+                else => @panic("unsupported format specifier"),
+            }
+        } else {
+            terminal_put_char(char);
+        }
     }
 }

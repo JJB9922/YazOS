@@ -26,8 +26,34 @@ fn encode_gdt_entry(target: [*]u8, source: GDT) void {
     target[6] |= (source.flags << 4);
 }
 
-fn load_gdt() void {
+pub fn set_gdt(limit: u32, base: i64) void {
+    _ = limit;
+    _ = base;
     asm volatile (
-        \\ lgdt
+        \\ gdtr:
+        \\ .word 0
+        \\ .long 0
+        \\ setGdt:
+        \\ movw 4(%esp), %ax
+        \\ movw %ax, (gdtr)
+        \\ movl 8(%esp), %eax
+        \\ movl %eax, (gdtr + 2)
+        \\ lgdt gdtr
+        \\ ret
+    );
+}
+
+pub fn reload_segment_registers() void {
+    asm volatile (
+        \\ reloadSegments:
+        \\  ljmp $0x08, $.reload_CS    // Long jump with segment selector
+        \\ .reload_CS:
+        \\  movw $0x10, %ax            // Load data segment selector
+        \\  movw %ax, %ds              // Reload DS
+        \\  movw %ax, %es              // Reload ES
+        \\  movw %ax, %fs              // Reload FS
+        \\  movw %ax, %gs              // Reload GS
+        \\  movw %ax, %ss              // Reload SS
+        \\  ret
     );
 }

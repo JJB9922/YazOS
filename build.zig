@@ -7,10 +7,13 @@ pub fn build(b: *std.Build) void {
     const exe = b.addExecutable(.{ .name = "YazOS.elf", .root_source_file = b.path("src/kernel/arch/i386/boot.zig"), .target = target, .optimize = optimize, .code_model = .kernel });
 
     const tty_mod = b.addModule("tty", .{ .root_source_file = b.path("src/kernel/arch/i386/tty.zig") });
+    const gdt_mod = b.addModule("gdt", .{ .root_source_file = b.path("src/kernel/arch/i386/gdt.zig") });
     const kernel_mod = b.addModule("kernel", .{ .root_source_file = b.path("src/kernel/kernel/kernel.zig"), .imports = &.{} });
 
     exe.setLinkerScript(b.path("src/kernel/arch/i386/linker.ld"));
     exe.root_module.addImport("kernel", kernel_mod);
+    gdt_mod.addImport("tty", tty_mod);
+    kernel_mod.addImport("gdt", gdt_mod);
     kernel_mod.addImport("tty", tty_mod);
 
     b.installArtifact(exe);
