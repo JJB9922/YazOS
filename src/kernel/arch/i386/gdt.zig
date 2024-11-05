@@ -1,6 +1,6 @@
 const tty = @import("tty");
 
-const GDT = struct { base: i64, limit: u32, access_byte: u8, flags: u16, offset: i32 };
+const GDT = struct { base: i64, limit: u32, access_byte: u8, flags: u16, offset: i64 };
 
 fn encode_gdt_entry(target: [*]u8, source: GDT) void {
     if (source.limit > 0xFFFFF) {
@@ -24,4 +24,10 @@ fn encode_gdt_entry(target: [*]u8, source: GDT) void {
 
     // Encode flags
     target[6] |= (source.flags << 4);
+}
+
+fn load_gdt() void {
+    asm volatile (
+        \\ lgdt
+    );
 }
